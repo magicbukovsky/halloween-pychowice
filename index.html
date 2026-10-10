@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Halloween w Pychowicach 🎃</title><meta name="theme-color" content="#171126"><meta name="description" content="Halloweenowa mapa Pychowic — odkryj dekoracje i miejsca z cukierkami.">
+<title>Halloween w Pychowicach 🎃</title><meta name="theme-color" content="#0b0d14"><meta name="description" content="Halloweenowa mapa Pychowic — odkryj dekoracje i miejsca z cukierkami.">
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
@@ -46,11 +46,61 @@ hr{border:0!important;border-top:1px solid #44344d!important;margin:27px 0!impor
  .gm-style .gmnoprint{margin-bottom:75px}
 }
 @media(prefers-reduced-motion:reduce){aside,.drawer-backdrop{transition:none!important}}
+
+/* Premium dark SaaS interface */
+:root{color-scheme:dark;--bg:#0b0d14;--panel:#10131d;--panel2:#171b28;--stroke:#292f3f;--text:#f4f5fb;--muted:#939bac;--orange:#fd9b56;--gold:#ffbe80}
+body{background:#0b0d14;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:-.01em}
+header{min-height:130px;padding:24px clamp(22px,3.2vw,48px);background:radial-gradient(ellipse at 92% -45%,#f1874922,transparent 44%),linear-gradient(120deg,#121522,#0c0e17);border-bottom:1px solid #2a2c38}
+header:before{content:'✳';top:-60px;right:8%;font-size:210px;letter-spacing:0;color:#ff995b;opacity:.035;transform:rotate(-15deg)}
+.brand{gap:17px}.brand-icon{width:57px;height:57px;border-radius:17px;background:linear-gradient(145deg,#ffb16e,#ec733d);font-size:30px;box-shadow:0 10px 35px #fd894027,inset 0 1px 0 #ffffff77}
+.eyebrow{font-size:10px;color:#a8b0c0;letter-spacing:.19em;font-weight:800}.brand-dot{color:#f9a364;margin:0 5px;font-size:8px}
+h1{font-size:clamp(24px,2.7vw,35px);font-weight:800;letter-spacing:-.055em}.heading-accent{color:#ffb17d}
+header p{color:#939bac;font-size:13px;margin-top:9px}
+.header-pill{position:absolute;top:27px;right:clamp(22px,3.2vw,48px);margin:0;border:1px solid #343b48;background:#171b27;border-radius:9px;color:#d1d7e2;font-size:10px;padding:9px 12px;letter-spacing:.1em}
+.live-dot,.map-label-status{display:inline-block;width:7px;height:7px;border-radius:50%;background:#73e0b4;box-shadow:0 0 0 3px #73e0b419;margin-right:4px}.pill-divider{color:#647084;margin:0 4px}
+.layout{grid-template-columns:minmax(340px,390px) minmax(0,1fr);height:calc(100dvh - 130px);min-height:570px}
+aside{background:#10131d;border-right:1px solid #272c39;padding:29px 25px 48px;scrollbar-color:#333a4b transparent}
+.section-kicker{color:#798397;font-size:10px;font-weight:800;letter-spacing:.17em;margin-bottom:9px}
+h2{font-size:24px;font-weight:700;letter-spacing:-.055em;color:#f4f5fa}.accent{color:#f5a46f}.section-icon{font-size:17px;color:#ffab73;vertical-align:3px}
+.section-sub{color:#8791a4;font-size:12px;margin-bottom:22px}
+.notice{background:linear-gradient(125deg,#1c1c27,#181a25);border:1px solid #343341;border-left:3px solid #f29a5e;border-radius:12px;padding:13px 14px;margin:0 0 29px;color:#aeb3c0;font-size:11px;line-height:1.7}
+.notice strong{display:block;color:#ffc093;font-size:11px;margin-bottom:2px}
+label{color:#c2c9d5;font-size:11px;letter-spacing:.025em;margin:18px 0 8px}
+input:not([type=checkbox]),textarea{background:#161a26;border:1px solid #323747;border-radius:10px;color:#f5f6fa;padding:13px 14px;font-size:13px;box-shadow:inset 0 1px 2px #0002}
+input:not([type=checkbox]):focus,textarea:focus{border-color:#ed9867;box-shadow:0 0 0 3px #ee98631c}
+input::placeholder,textarea::placeholder{color:#737d90}
+button{background:linear-gradient(130deg,#ffb67b,#f38d55);color:#231a19;border:1px solid #ffbb8c;border-radius:10px;box-shadow:0 5px 18px #ed85401d;font-size:13px}
+button.secondary{background:#1c2230;color:#e1e5ef;border:1px solid #394253;box-shadow:none}
+button:hover{filter:brightness(1.12)}
+.buttons{gap:9px}.buttons button{font-size:11px}.buttons button[type=submit]{font-size:13px;letter-spacing:.01em}
+.checks label{background:#1a202d;border:1px solid #323a4a;border-radius:10px;color:#d4d9e4;font-size:11px;padding:11px 13px}
+.checks input{accent-color:#f3a26b}
+.hint{color:#7e889a}#status{color:#ffbb88}
+hr{border-top:1px solid #2c3241!important;margin:30px 0!important}
+#entries li{background:#181e2b;border:1px solid #30394a;border-radius:12px;padding:14px;margin:10px 0}
+#entries li strong{color:#f2f3fa}#entries li button{border-radius:8px}
+.small{color:#939dad}a{color:#f9b98e}
+.map-wrap{background:#141926}.map-label{top:22px;left:22px;background:#10151eea;border:1px solid #3b4453;border-radius:15px;padding:16px 18px;box-shadow:0 12px 35px #0b0e1c44;min-width:230px;z-index:5}
+.map-label-top{display:flex;align-items:center;gap:8px;color:#9ba6b7;font-size:9px;font-weight:800;letter-spacing:.16em;margin-bottom:9px}.map-label-icon{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#f5a26920;color:#ffb17b;font-size:20px;letter-spacing:0}.map-label-status{width:6px;height:6px;margin-left:3px}
+.map-label strong{font-size:17px;letter-spacing:-.035em}.map-label>span{font-size:11px;color:#919caf}
+.gm-style .gm-style-iw-c{background:#171c29!important;border-color:#465062!important}.gm-style .gm-style-iw-tc:after{background:#171c29!important}
+.map-popup{color:#f5f5fa}
+@media(min-width:801px){header p{max-width:500px}.map-label{top:24px;left:24px}}
+@media(max-width:800px){
+ header{padding:16px 17px 15px;min-height:112px}.brand{gap:11px}.brand-icon{width:45px;height:45px;border-radius:13px;font-size:25px}h1{font-size:23px}
+ .eyebrow{font-size:9px}.header-pill{position:static;display:inline-flex;margin-top:10px;padding:5px 8px;font-size:8px}
+ .map-wrap{height:calc(100dvh - 112px);min-height:420px}
+ .map-label{left:13px;top:13px;min-width:0;padding:11px 13px;border-radius:12px}.map-label-top{margin-bottom:5px;font-size:8px}.map-label-icon{width:19px;height:19px;font-size:15px}.map-label strong{font-size:14px}.map-label>span{font-size:10px}
+ aside{background:#111520;border:1px solid #343c4b;border-radius:22px 22px 0 0;padding:18px 20px calc(28px + env(safe-area-inset-bottom))}
+ .floating-actions{background:#121722eb;border:1px solid #3c4555;border-radius:16px;box-shadow:0 15px 45px #0008;padding:8px;gap:8px}
+ .floating-actions button{font-size:12px;border-radius:10px;padding:14px 8px}.floating-actions button.secondary{background:#222b3b;border-color:#3b485a}
+ .drawer-top strong{font-size:16px}
+}
 </style></head><body>
-<header><div class="brand"><div class="brand-icon" aria-hidden="true">🎃</div><div><div class="eyebrow">Pychowice · Kraków</div><h1>Halloween w Pychowicach</h1></div></div><p>Odkrywaj nawiedzone domy, halloweenowe dekoracje i miejsca pełne słodkości w swojej okolicy.</p><span class="header-pill">✦ TWOJA LOKALNA MAPA HALLOWEEN ✦</span></header>
+<header><div class="brand"><div class="brand-icon" aria-hidden="true">🎃</div><div><div class="eyebrow">PYCHOWICE <span class="brand-dot">●</span> HALLOWEEN 2026</div><h1>Halloween <span class="heading-accent">Pychowice</span></h1></div></div><p>Odkrywaj nawiedzone domy, halloweenowe dekoracje i miejsca pełne słodkości w swojej okolicy.</p><span class="header-pill"><span class="live-dot"></span> COMMUNITY MAP <span class="pill-divider">/</span> KRAKÓW</span></header>
 <div class="layout"><aside id="drawer" aria-label="Panel mapy"><div class="drawer-top"><strong>🎃 Halloween w Pychowicach</strong><button class="secondary" id="closeDrawer" type="button" aria-label="Zamknij panel">✕</button></div>
-<div class="notice"><strong>Wersja demonstracyjna.</strong> Wpisy są zapisane tylko w tej przeglądarce — inni mieszkańcy jeszcze ich nie widzą. Nie dodawaj cudzego adresu bez zgody.</div>
-<h2>👻 Dodaj straszne miejsce</h2><p class="section-sub">Pokaż sąsiadom, gdzie czeka halloweenowa magia.</p>
+<div class="notice"><strong>✧ Wersja demonstracyjna</strong><span> Wpisy widzisz tylko Ty. Wspólna mapa mieszkańców pojawi się w kolejnym etapie. Dodawaj adresy wyłącznie za zgodą właścicieli.</span></div>
+<div class="section-kicker">01 / TWOJE ZGŁOSZENIE</div><h2>Dodaj <span class="accent">miejsce</span> <span class="section-icon">↗</span></h2><p class="section-sub">Pokaż sąsiadom, gdzie czeka halloweenowa magia.</p>
 <form id="form">
 <label for="address">Adres (Pychowice, Kraków)</label><input id="address" required maxlength="180" placeholder="Ulica i numer domu">
 <div class="buttons"><button class="secondary" type="button" id="locate">Znajdź adres na mapie</button><button class="secondary" type="button" id="pick">Wskaż na mapie</button></div>
@@ -62,11 +112,11 @@ hr{border:0!important;border-top:1px solid #44344d!important;margin:27px 0!impor
 <div class="buttons"><button type="submit">Dodaj do mojej mapy</button></div>
 </form>
 <hr style="border:0;border-top:1px solid #4a315d;margin:22px 0">
-<h2>🕸️ Odkrywaj miejsca</h2><p class="section-sub">Filtruj punkty widoczne na mapie.</p>
+<div class="section-kicker">02 / EKSPLORUJ</div><h2>Odkrywaj <span class="accent">miejsca</span></h2><p class="section-sub">Filtruj punkty widoczne na mapie.</p>
 <div class="checks"><label><input type="checkbox" id="showDecor" checked style="width:auto"> 🎃 Dekoracje</label><label><input type="checkbox" id="showCandy" checked style="width:auto"> 🍬 Cukierki</label></div>
 <ul id="entries"></ul>
 <p class="hint">Mapa: Google Maps. Wpisy można usuwać z tej przeglądarki.</p>
-</aside><div class="map-wrap"><div class="map-label"><strong>🦇 Mapa Pychowic</strong><span>Znajdź halloweenowe atrakcje w okolicy</span></div><div id="map" aria-label="Mapa Pychowic"></div></div></div><div class="drawer-backdrop" id="drawerBackdrop"></div><nav class="floating-actions" aria-label="Działania mapy"><button class="secondary" type="button" id="browseBtn">🕸️ Miejsca <span id="placeCount"></span></button><button type="button" id="addBtn">＋ Dodaj dom</button></nav>
+</aside><div class="map-wrap"><div class="map-label"><div class="map-label-top"><span class="map-label-icon">⌖</span><span>LIVE MAP <span class="map-label-status">●</span></span></div><strong>Pychowice, Kraków</strong><span>Odkrywaj miejsca w swojej okolicy</span></div><div id="map" aria-label="Mapa Pychowic"></div></div></div><div class="drawer-backdrop" id="drawerBackdrop"></div><nav class="floating-actions" aria-label="Działania mapy"><button class="secondary" type="button" id="browseBtn">◈ Odkrywaj <span id="placeCount"></span></button><button type="button" id="addBtn">＋ Dodaj miejsce</button></nav>
 <script src="config.js"></script>
 <script>
 (()=>{'use strict';
