@@ -137,7 +137,7 @@ hr{border-top:1px solid #2c3241!important;margin:30px 0!important}
 const $=id=>document.getElementById(id);
 const db=window.supabase?.createClient('https://jhxoxuowxwvnmrygioox.supabase.co','sb_publishable_aZIJOi53EyddXbsvBcgSEg_to_LNUTz',{auth:{persistSession:false,autoRefreshToken:false}});
 const center={lat:50.035,lng:19.893};
-let map,geocoder,infoWindow,entries=[],selected=null,picking=false,tempMarker=null,markers=[];
+let map,geocoder,infoWindow,entries=[],selected=null,picking=false,tempMarker=null,markers=[];window.halloweenGetEntries=()=>entries;
 async function loadPlaces(){
  if(!db){$('syncStatus').textContent='Nie można uruchomić połączenia z bazą.';return}
  const {data,error}=await db.from('halloween_places').select('id,address,lat,lon,hours,note,decor,candy,no_halloween,created_at').order('created_at',{ascending:false}).limit(500);
@@ -145,6 +145,7 @@ async function loadPlaces(){
  entries=(data||[]).map(x=>({...x,noHalloween:x.no_halloween}));
  $('syncStatus').textContent='Zatwierdzone miejsca: '+entries.length;
  if(map)draw();
+ window.dispatchEvent(new Event('halloween:loaded'));
 }
 function position(lat,lon){return {lat,lng:lon}}
 function select(lat,lon){
@@ -161,10 +162,12 @@ function draw(){
   const pin={url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="48"><rect x="3" y="3" width="38" height="38" rx="12" fill="'+(item.noHalloween?'#65728b':'#ed843c')+'" stroke="#ffd7a0" stroke-width="2"/><text x="22" y="30" font-size="23" text-anchor="middle">'+(item.noHalloween?'🌙':item.candy?'🍬':'🎃')+'</text></svg>'),scaledSize:new google.maps.Size(44,48),anchor:new google.maps.Point(22,41)};
   const marker=new google.maps.Marker({position:position(item.lat,item.lon),map,icon:pin,title:item.address});markers.push(marker);
   const el=document.createElement('div');el.className='map-popup';const heading=document.createElement('strong');heading.textContent=(item.noHalloween?'🌙 ':((item.decor?'🎃 ':'')+(item.candy?'🍬 ':'')))+item.address;el.append(heading);
+  if(item.image_url){const image=document.createElement('img');image.style.cssText='width:100%;max-height:170px;object-fit:cover;border-radius:10px';image.dataset.photo=item.image_url;image.alt='Dekoracje domu';el.append(image)}
   for(const s of [item.noHalloween?'Prosimy nie dzwonić po cukierki.':(item.hours&&'Godziny: '+item.hours),item.note])if(s){const p=document.createElement('p');p.textContent=s;el.append(p)}
   marker.addListener('click',()=>{infoWindow.setContent(el);infoWindow.open({anchor:marker,map})});
   const li=document.createElement('li');const title=document.createElement('strong');title.textContent=heading.textContent;li.append(title);
   const sub=document.createElement('div');sub.className='small';sub.textContent=item.noHalloween?'🌙 Nie uczestniczą — prosimy nie dzwonić':(item.candy?(item.hours||'Godziny niepodane'):'Tylko dekoracje — bez dzwonienia');li.append(sub);
+  if(item.candy){const label=document.createElement('label');label.style.margin='9px 0';const check=document.createElement('input');check.type='checkbox';check.className='route-check';check.dataset.routeId=item.id;label.append(check,document.createTextNode(' Dodaj do spaceru'));li.append(label)}
   const go=document.createElement('button');go.type='button';go.className='secondary';go.textContent='Pokaż';
   go.onclick=()=>{map.setCenter(position(item.lat,item.lon));map.setZoom(17);infoWindow.setContent(el);infoWindow.open({anchor:marker,map});if(innerWidth<801)closeDrawer();else window.scrollTo({top:0,behavior:'smooth'})};li.append(go);
   $('entries').append(li);
@@ -194,8 +197,9 @@ $('form').onsubmit=async e=>{
  if(!db){$('status').textContent='Baza jest chwilowo niedostępna.';return}
  const mode=document.querySelector('input[name="participation"]:checked')?.value||'candy';
  const btn=$('submitPlace');btn.disabled=true;$('status').textContent='Wysyłanie zgłoszenia…';
- const payload={address:$('address').value.trim(),lat:selected.lat,lon:selected.lon,hours:mode==='candy'?$('hours').value.trim():'',decor:mode!=='none',candy:mode==='candy',no_halloween:mode==='none',note:$('note').value.trim(),owner_consent:true};
+ const payload={image_url:window.halloweenPendingPhoto||null,address:$('address').value.trim(),lat:selected.lat,lon:selected.lon,hours:mode==='candy'?$('hours').value.trim():'',decor:mode!=='none',candy:mode==='candy',no_halloween:mode==='none',note:$('note').value.trim(),owner_consent:true};
  try{
+  const photo=$('photo').files[0];if(photo){if(photo.size>3145728||!['image/jpeg','image/png','image/webp'].includes(photo.type))throw Error('Zdjęcie musi być JPG, PNG lub WebP do 3 MB');const path='submissions/'+crypto.randomUUID()+'.'+({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[photo.type]);const uploaded=await db.storage.from('halloween-photos').upload(path,photo,{contentType:photo.type});if(uploaded.error)throw uploaded.error;payload.image_url=path}
   const {error}=await db.from('halloween_places').insert(payload);
   if(error)throw error;
   $('form').reset();document.querySelector('input[name="participation"][value="candy"]').checked=true;syncParticipation();selected=null;
