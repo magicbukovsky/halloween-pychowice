@@ -48,17 +48,19 @@ async function gallery(){
   document.querySelectorAll('[data-photo]').forEach(x=>{if(x.dataset.photo===item.image_url)x.src=data.signedUrl});
  }
 }
+let adminRequestVersion=0;
 async function admin(){
+ const requestVersion=++adminRequestVersion;
  if(!db)return;
- const {data:{user},error:authError}=await db.auth.getUser();if(authError)console.warn('Auth:',authError.message);
+ const {data:{user},error:authError}=await db.auth.getUser();if(requestVersion!==adminRequestVersion)return;if(authError)console.warn('Auth:',authError.message);
  $('adminLogout').hidden=!user;
  $('adminEntries').replaceChildren();
  if(!user){$('adminStatus').textContent='Zaloguj się, aby moderować.';return}
- const {data:role,error:roleError}=await db.from('halloween_moderators').select('user_id').eq('user_id',user.id).maybeSingle();if(roleError){$('adminStatus').textContent='Nie udało się sprawdzić uprawnień moderatora.';return}
+ const {data:role,error:roleError}=await db.from('halloween_moderators').select('user_id').eq('user_id',user.id).maybeSingle();if(requestVersion!==adminRequestVersion)return;if(roleError){$('adminStatus').textContent='Nie udało się sprawdzić uprawnień moderatora.';return}
  if(!role){$('adminStatus').textContent='To konto nie ma przypisanej roli moderatora.';return}
  $('adminStatus').textContent='Zalogowano jako moderator.';
  const {data,error}=await db.from('halloween_places').select('id,address,note,status').eq('status','pending').limit(100);
- if(error){$('adminStatus').textContent='Nie udało się pobrać zgłoszeń.';return}
+ if(requestVersion!==adminRequestVersion)return;if(error){$('adminStatus').textContent='Nie udało się pobrać zgłoszeń.';return}
  if(!data?.length){$('adminEntries').textContent='Brak oczekujących zgłoszeń.';return}
  $('adminStatus').textContent='Oczekujące zgłoszenia: '+data.length;
  for(const item of data){
