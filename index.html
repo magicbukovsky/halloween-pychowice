@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Halloween w Pychowicach 🎃</title><meta name="theme-color" content="#171126"><meta name="description" content="Halloweenowa mapa Pychowic — odkryj dekoracje i miejsca z cukierkami.">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
 :root{color-scheme:dark;--bg:#100d19;--panel:#1a1425;--panel2:#241b31;--stroke:#41334e;--text:#fcf6ff;--muted:#b5a9c3;--orange:#ff8b31;--gold:#ffc46e}
@@ -25,7 +25,7 @@ button{border:0;border-radius:12px;padding:12px 15px;background:linear-gradient(
 .checks{display:flex;gap:8px;flex-wrap:wrap}.checks label{margin:5px 0;display:flex;align-items:center;gap:8px;background:#2d223a;border:1px solid #49354f;padding:10px 12px;border-radius:11px;font-size:12px;font-weight:700;cursor:pointer}.checks input{accent-color:#ff943c;width:16px;height:16px;margin:0}
 hr{border:0!important;border-top:1px solid #44344d!important;margin:27px 0!important}
 #entries{padding:0;list-style:none}#entries li{background:#281e35;border:1px solid #48374f;border-radius:14px;margin:9px 0;padding:13px}#entries li strong{font-size:13px}#entries button{margin-top:10px;padding:7px 12px;font-size:11px}.small{font-size:11px;color:#bcaec8;margin-top:5px}a{color:#ffc080}
-.leaflet-popup-content-wrapper{background:#24182f;color:#fff;border:1px solid #725378;border-radius:13px}.leaflet-popup-tip{background:#24182f}.leaflet-popup-content{font:13px 'DM Sans',sans-serif}.leaflet-popup-content p{margin:7px 0}.leaflet-container a.leaflet-popup-close-button{color:#fff}
+.gm-style .gm-style-iw-c{background:#24182f!important;color:white!important;border:1px solid #725378;border-radius:13px!important}.gm-style .gm-style-iw-tc:after{background:#24182f!important}.gm-style .gm-style-iw-d{overflow:auto!important}.gm-style .gm-ui-hover-effect{filter:invert(1)}.map-popup{font:13px "DM Sans",sans-serif;color:white;max-width:240px}.map-popup p{margin:7px 0}
 .spooky-pin{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:2px solid #ffd7a0;border-radius:13px 13px 13px 3px;background:linear-gradient(145deg,#f99b42,#c65336);font-size:21px;box-shadow:0 5px 17px #21102588;transform:rotate(-9deg)}.spooky-pin span{transform:rotate(9deg)}
 @media(max-width:800px){header{padding:16px 18px 19px}.brand-icon{width:45px;height:45px;font-size:27px}header p{font-size:12px;margin-top:8px}.layout{display:flex;flex-direction:column;height:auto;min-height:0}.map-wrap{order:0}#map{height:49dvh;min-height:315px}.map-label{left:12px;top:12px;padding:8px 12px}.map-label strong{font-size:13px}.map-label span{font-size:10px}aside{order:1;overflow:visible;padding:24px 18px 45px;border-right:0}.header-pill{margin-top:9px}.buttons button{min-width:130px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
@@ -43,7 +43,7 @@ hr{border:0!important;border-top:1px solid #44344d!important;margin:27px 0!impor
  .floating-actions{display:flex;position:fixed;z-index:950;left:14px;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));gap:9px;padding:9px;background:#1d1527e8;border:1px solid #6a4c67;border-radius:18px;backdrop-filter:blur(16px);box-shadow:0 12px 35px #0009}
  .floating-actions button{flex:1;font-size:13px;padding:13px 9px}.floating-actions button.secondary{background:#49334f}
  .map-label{top:13px;left:13px}
- .leaflet-bottom.leaflet-right{bottom:84px}
+ .gm-style .gmnoprint{margin-bottom:75px}
 }
 @media(prefers-reduced-motion:reduce){aside,.drawer-backdrop{transition:none!important}}
 </style></head><body>
@@ -65,36 +65,77 @@ hr{border:0!important;border-top:1px solid #44344d!important;margin:27px 0!impor
 <h2>🕸️ Odkrywaj miejsca</h2><p class="section-sub">Filtruj punkty widoczne na mapie.</p>
 <div class="checks"><label><input type="checkbox" id="showDecor" checked style="width:auto"> 🎃 Dekoracje</label><label><input type="checkbox" id="showCandy" checked style="width:auto"> 🍬 Cukierki</label></div>
 <ul id="entries"></ul>
-<p class="hint">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. Geokodowanie: Nominatim. Wpisy można usuwać z tej przeglądarki.</p>
+<p class="hint">Mapa: Google Maps. Wpisy można usuwać z tej przeglądarki.</p>
 </aside><div class="map-wrap"><div class="map-label"><strong>🦇 Mapa Pychowic</strong><span>Znajdź halloweenowe atrakcje w okolicy</span></div><div id="map" aria-label="Mapa Pychowic"></div></div></div><div class="drawer-backdrop" id="drawerBackdrop"></div><nav class="floating-actions" aria-label="Działania mapy"><button class="secondary" type="button" id="browseBtn">🕸️ Miejsca <span id="placeCount"></span></button><button type="button" id="addBtn">＋ Dodaj dom</button></nav>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="config.js"></script>
 <script>
 (()=>{'use strict';
-const key='pychowice-halloween-demo-v1', center=[50.035,19.893], map=L.map('map').setView(center,15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
-const $=id=>document.getElementById(id), layer=L.layerGroup().addTo(map);
-let entries=[],selected=null,picking=false,tempMarker=null;
-try{const data=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(data))entries=data.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon));}catch(e){}
-const save=()=>{try{localStorage.setItem(key,JSON.stringify(entries))}catch(e){$('status').textContent='Nie udało się zapisać wpisu w przeglądarce.'}};
-function select(lat,lon){selected={lat,lon};if(tempMarker)map.removeLayer(tempMarker);tempMarker=L.marker([lat,lon]).addTo(map).bindPopup('Wybrana lokalizacja').openPopup();map.setView([lat,lon],Math.max(map.getZoom(),16));$('status').textContent='📍 Lokalizacja wybrana. Możesz zapisać wpis.'}
-function draw(){layer.clearLayers();$('entries').replaceChildren();let count=0;for(const item of entries){if(!((item.decor&&$('showDecor').checked)||(item.candy&&$('showCandy').checked)))continue;count++;
-const pin=L.divIcon({className:'',html:'<div class="spooky-pin"><span>'+ (item.candy?'🍬':'🎃') +'</span></div>',iconSize:[40,40],iconAnchor:[20,37],popupAnchor:[0,-34]});const marker=L.marker([item.lat,item.lon],{icon:pin}).addTo(layer);
-const el=document.createElement('div');const heading=document.createElement('strong');heading.textContent=(item.decor?'🎃 ':'')+(item.candy?'🍬 ':'')+item.address;el.append(heading);
-for(const s of [item.hours&&'Godziny: '+item.hours,item.note])if(s){const p=document.createElement('p');p.textContent=s;el.append(p)}marker.bindPopup(el);
-const li=document.createElement('li');const title=document.createElement('strong');title.textContent=heading.textContent;li.append(title);const sub=document.createElement('div');sub.className='small';sub.textContent=item.hours||'Godziny niepodane';li.append(sub);
-const go=document.createElement('button');go.type='button';go.className='secondary';go.textContent='Pokaż';go.onclick=()=>{map.setView([item.lat,item.lon],17);marker.openPopup();(innerWidth<801?closeDrawer():window.scrollTo({top:0,behavior:'smooth'}))};li.append(go);
-const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Usuń';del.style.marginLeft='7px';del.onclick=()=>{if(confirm('Usunąć ten lokalny wpis?')){entries=entries.filter(x=>x.id!==item.id);save();draw()}};li.append(del);$('entries').append(li)}
-const countLabel=$('placeCount');if(countLabel)countLabel.textContent='('+count+')';if(!count){const li=document.createElement('li');li.textContent='Brak miejsc. Dodaj pierwsze zgłoszenie!';$('entries').append(li)}}
-$('locate').onclick=async()=>{const addr=$('address').value.trim();if(!addr){$('status').textContent='Najpierw wpisz adres.';return}const btn=$('locate');btn.disabled=true;$('status').textContent='Szukam adresu…';try{const url='https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=pl&q='+encodeURIComponent(addr+', Pychowice, Kraków');const r=await fetch(url);if(!r.ok)throw Error('Usługa wyszukiwania jest niedostępna');const results=await r.json();const best=results.find(x=>Number(x.lat)>50.015&&Number(x.lat)<50.06&&Number(x.lon)>19.85&&Number(x.lon)<19.94);if(!best)throw Error('Nie znaleziono adresu w okolicy Pychowic. Wskaż miejsce ręcznie.');select(Number(best.lat),Number(best.lon))}catch(e){$('status').textContent=e.message||'Błąd wyszukiwania'}finally{btn.disabled=false}};
-$('pick').onclick=()=>{picking=true;$('status').textContent='Dotknij wybranego punktu na mapie.';if(innerWidth<801)closeDrawer()};
-map.on('click',e=>{if(picking){select(e.latlng.lat,e.latlng.lng);picking=false}});
-$('form').onsubmit=e=>{e.preventDefault();if(!selected){$('status').textContent='Najpierw znajdź adres lub wskaż lokalizację na mapie.';return}if(!$('decor').checked&&!$('candy').checked){$('status').textContent='Zaznacz dekoracje lub cukierki.';return}
-entries.push({id:String(Date.now())+Math.random(),address:$('address').value.trim(),lat:selected.lat,lon:selected.lon,hours:$('hours').value.trim(),decor:$('decor').checked,candy:$('candy').checked,note:$('note').value.trim()});save();draw();$('form').reset();$('decor').checked=true;$('candy').checked=true;selected=null;if(tempMarker){map.removeLayer(tempMarker);tempMarker=null}$('status').textContent='Dodano lokalnie! Wspólna baza pojawi się w kolejnym etapie.'};
-
-function openDrawer(target){document.body.classList.add('drawer-open');$('drawer').scrollTop=0;if(target==='browse')$('entries').scrollIntoView({block:'nearest',behavior:'smooth'});}
-function closeDrawer(){document.body.classList.remove('drawer-open');}
+const $=id=>document.getElementById(id);
+const storageKey='pychowice-halloween-demo-v1';
+const center={lat:50.035,lng:19.893};
+let map,geocoder,infoWindow,entries=[],selected=null,picking=false,tempMarker=null,markers=[];
+try{const data=JSON.parse(localStorage.getItem(storageKey)||'[]');if(Array.isArray(data))entries=data.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon));}catch(e){}
+const save=()=>{try{localStorage.setItem(storageKey,JSON.stringify(entries))}catch(e){$('status').textContent='Nie udało się zapisać wpisu w przeglądarce.'}};
+function position(lat,lon){return {lat,lng:lon}}
+function select(lat,lon){
+ selected={lat,lon};
+ if(tempMarker)tempMarker.setMap(null);
+ tempMarker=new google.maps.Marker({position:position(lat,lon),map,title:'Wybrana lokalizacja'});
+ map.setCenter(position(lat,lon));map.setZoom(Math.max(map.getZoom()||15,16));
+ $('status').textContent='📍 Lokalizacja wybrana. Możesz zapisać wpis.';
+}
+function draw(){
+ markers.forEach(m=>m.setMap(null));markers=[];$('entries').replaceChildren();let count=0;
+ for(const item of entries){
+  if(!((item.decor&&$('showDecor').checked)||(item.candy&&$('showCandy').checked)))continue;count++;
+  const pin={url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="48"><rect x="3" y="3" width="38" height="38" rx="12" fill="#ed843c" stroke="#ffd7a0" stroke-width="2"/><text x="22" y="30" font-size="23" text-anchor="middle">'+(item.candy?'🍬':'🎃')+'</text></svg>'),scaledSize:new google.maps.Size(44,48),anchor:new google.maps.Point(22,41)};
+  const marker=new google.maps.Marker({position:position(item.lat,item.lon),map,icon:pin,title:item.address});markers.push(marker);
+  const el=document.createElement('div');el.className='map-popup';const heading=document.createElement('strong');heading.textContent=(item.decor?'🎃 ':'')+(item.candy?'🍬 ':'')+item.address;el.append(heading);
+  for(const s of [item.hours&&'Godziny: '+item.hours,item.note])if(s){const p=document.createElement('p');p.textContent=s;el.append(p)}
+  marker.addListener('click',()=>{infoWindow.setContent(el);infoWindow.open({anchor:marker,map})});
+  const li=document.createElement('li');const title=document.createElement('strong');title.textContent=heading.textContent;li.append(title);
+  const sub=document.createElement('div');sub.className='small';sub.textContent=item.hours||'Godziny niepodane';li.append(sub);
+  const go=document.createElement('button');go.type='button';go.className='secondary';go.textContent='Pokaż';
+  go.onclick=()=>{map.setCenter(position(item.lat,item.lon));map.setZoom(17);infoWindow.setContent(el);infoWindow.open({anchor:marker,map});if(innerWidth<801)closeDrawer();else window.scrollTo({top:0,behavior:'smooth'})};li.append(go);
+  const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Usuń';del.style.marginLeft='7px';
+  del.onclick=()=>{if(confirm('Usunąć ten lokalny wpis?')){entries=entries.filter(x=>x.id!==item.id);save();draw()}};li.append(del);$('entries').append(li);
+ }
+ $('placeCount').textContent='('+count+')';
+ if(!count){const li=document.createElement('li');li.textContent='Brak miejsc. Dodaj pierwsze zgłoszenie!';$('entries').append(li)}
+}
+function openDrawer(target){document.body.classList.add('drawer-open');$('drawer').scrollTop=0;if(target==='browse')$('entries').scrollIntoView({block:'nearest',behavior:'smooth'})}
+function closeDrawer(){document.body.classList.remove('drawer-open')}
 $('addBtn').onclick=()=>openDrawer('add');$('browseBtn').onclick=()=>openDrawer('browse');$('closeDrawer').onclick=closeDrawer;$('drawerBackdrop').onclick=closeDrawer;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
-$('showDecor').onchange=draw;$('showCandy').onchange=draw;draw();
+$('locate').onclick=async()=>{
+ const addr=$('address').value.trim();if(!addr){$('status').textContent='Najpierw wpisz adres.';return}
+ const btn=$('locate');btn.disabled=true;$('status').textContent='Szukam adresu…';
+ try{
+  const result=await geocoder.geocode({address:addr+', Pychowice, Kraków, Polska',region:'PL'});
+  const best=result.results.find(x=>{const p=x.geometry.location;return p.lat()>50.015&&p.lat()<50.06&&p.lng()>19.85&&p.lng()<19.94});
+  if(!best)throw Error('Nie znaleziono adresu w okolicy Pychowic. Wskaż miejsce ręcznie.');
+  select(best.geometry.location.lat(),best.geometry.location.lng());
+ }catch(e){$('status').textContent=e.message||'Błąd wyszukiwania'}finally{btn.disabled=false}
+};
+$('pick').onclick=()=>{picking=true;$('status').textContent='Dotknij wybranego punktu na mapie.';if(innerWidth<801)closeDrawer()};
+$('form').onsubmit=e=>{
+ e.preventDefault();if(!selected){$('status').textContent='Najpierw znajdź adres lub wskaż lokalizację na mapie.';return}
+ if(!$('decor').checked&&!$('candy').checked){$('status').textContent='Zaznacz dekoracje lub cukierki.';return}
+ entries.push({id:String(Date.now())+Math.random(),address:$('address').value.trim(),lat:selected.lat,lon:selected.lon,hours:$('hours').value.trim(),decor:$('decor').checked,candy:$('candy').checked,note:$('note').value.trim()});
+ save();draw();$('form').reset();$('decor').checked=true;$('candy').checked=true;selected=null;
+ if(tempMarker){tempMarker.setMap(null);tempMarker=null}
+ $('status').textContent='Dodano lokalnie! Wspólna baza pojawi się w kolejnym etapie.';
+};
+$('showDecor').onchange=()=>{if(map)draw()};$('showCandy').onchange=()=>{if(map)draw()};
+window.initHalloweenMap=()=>{
+ map=new google.maps.Map($('map'),{center,zoom:15,mapTypeControl:false,streetViewControl:false,fullscreenControl:true,gestureHandling:'greedy',styles:[{featureType:'poi',stylers:[{visibility:'off'}]},{featureType:'transit',stylers:[{visibility:'off'}]}]});
+ geocoder=new google.maps.Geocoder();infoWindow=new google.maps.InfoWindow();
+ map.addListener('click',e=>{if(picking){select(e.latLng.lat(),e.latLng.lng());picking=false}});
+ draw();
+};
+const apiKey=window.HALLOWEEN_CONFIG?.googleMapsApiKey;
+if(!apiKey||apiKey==='TWOJ_KLUCZ_API'){$('map').textContent='Brak konfiguracji klucza Google Maps w config.js.';return}
+const s=document.createElement('script');s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(apiKey)+'&callback=initHalloweenMap&v=weekly&language=pl&region=PL';s.async=true;s.defer=true;
+s.onerror=()=>{$('map').textContent='Nie udało się załadować Google Maps. Sprawdź klucz API i ograniczenia domeny.'};document.head.append(s);
 })();
 </script></body></html>
