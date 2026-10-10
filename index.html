@@ -154,6 +154,14 @@ header{overflow:hidden}.night-sky{position:absolute;inset:0;pointer-events:none;
 #status:has(+ .participation-heading){transition:opacity .2s}.house-card button:active,.floating-actions button:active{transform:scale(.97)}.gallery>div:hover{border-color:#ffba81;box-shadow:0 10px 24px #0005}
 @media(max-width:800px){.night-moon{right:13%;top:13px;width:62px;height:62px;opacity:.45}.night-bat{font-size:16px;right:30%}.night-star{font-size:13px}.countdown-clock b{font-size:27px}.house-card .house-navigate{margin-left:5px}.house-card button{font-size:11px;padding:10px}.countdown-clock{margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.night-star,.night-bat{animation:none!important}.house-card,.gallery>div{transition:none!important}}
+/* iOS drawer fix: navigation stays above backdrop, drawer stays legible */
+@media(max-width:800px){
+ body.drawer-open .floating-actions{z-index:1400;pointer-events:auto}
+ body.drawer-open aside{z-index:1300;bottom:calc(76px + env(safe-area-inset-bottom));max-height:calc(88dvh - 76px);background:#24142f;opacity:1}
+ body.drawer-open .drawer-backdrop{z-index:1100}
+ .floating-actions button{opacity:1!important;pointer-events:auto!important;touch-action:manipulation}
+ .drawer-top{position:sticky;top:-16px;z-index:2;background:#24142f;padding:13px 0 10px}
+}
 </style></head><body>
 <header><div class="night-sky" aria-hidden="true"><span class="night-moon"></span><span class="night-star star-one">✦</span><span class="night-star star-two">✧</span><span class="night-star star-three">✦</span><span class="night-bat bat-one">🦇</span><span class="night-bat bat-two">🦇</span></div><div class="brand"><div class="brand-icon" aria-hidden="true">🎃</div><div><div class="eyebrow">PYCHOWICE <span class="brand-dot">●</span> HALLOWEEN 2026</div><h1>Halloween <span class="heading-accent">Pychowice</span></h1></div></div><p>Jedna noc. Setki słodkich przygód. Odkryj, gdzie Pychowice rozświetlają się w Halloween.</p><span class="header-pill"><span class="live-dot"></span> ✦ HALLOWEENOWA NOC <span class="pill-divider">/</span> 31.10</span></header>
 <div class="app-marquee" aria-hidden="true"><span>✦ CUKIEREK ALBO PSIKUS</span><span>✧ PYCHOWICE PO ZMROKU</span><span>✦ 31 PAŹDZIERNIKA</span></div><div class="layout"><aside id="drawer" aria-label="Panel mapy"><div class="drawer-top"><strong>🎃 Halloween w Pychowicach</strong><button class="secondary" id="closeDrawer" type="button" aria-label="Zamknij panel">✕</button></div>
@@ -220,7 +228,7 @@ function draw(){
  $('placeCount').textContent='('+count+')';
  if(!count){const li=document.createElement('li');li.textContent='Brak miejsc. Dodaj pierwsze zgłoszenie!';$('entries').append(li)}
 }
-function openDrawer(target){document.body.classList.add('drawer-open');$('drawer').scrollTop=0;if(target==='browse')$('entries').scrollIntoView({block:'nearest',behavior:'smooth'})}
+function openDrawer(target){document.body.classList.add('drawer-open');const drawer=$('drawer');drawer.scrollTop=0;requestAnimationFrame(()=>{const anchor=target==='browse'?document.querySelector('.filter-chips'):document.querySelector('#form');if(anchor)drawer.scrollTop=Math.max(0,anchor.getBoundingClientRect().top-drawer.getBoundingClientRect().top+drawer.scrollTop-70)})}
 function closeDrawer(){document.body.classList.remove('drawer-open')}
 $('addBtn').onclick=()=>openDrawer('add');$('browseBtn').onclick=()=>openDrawer('browse');$('closeDrawer').onclick=closeDrawer;$('drawerBackdrop').onclick=closeDrawer;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
