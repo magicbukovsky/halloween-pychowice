@@ -3,6 +3,7 @@
 const $=id=>document.getElementById(id);
 const db=window.halloweenDb||window.supabase?.createClient('https://jhxoxuowxwvnmrygioox.supabase.co','sb_publishable_aZIJOi53EyddXbsvBcgSEg_to_LNUTz',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const selected=new Set();
+let galleryGeneration=0;
 let photoUrls=new Map();
 const places=()=>window.halloweenGetEntries?.()||[];
 function stats(){
@@ -29,12 +30,12 @@ $('startRoute').onclick=()=>{
 };
 async function gallery(){
  if(!db)return;
- const el=$('gallery');el.replaceChildren();photoUrls=new Map();
+ const el=$('gallery');el.replaceChildren();photoUrls=new Map();const generation=++galleryGeneration;
  const items=places().filter(p=>p.image_url);
  if(!items.length){el.textContent='Brak zatwierdzonych zdjęć.';return}
  for(const item of items){
   const {data}=await db.storage.from('halloween-photos').createSignedUrl(item.image_url,3600);
-  if(!data?.signedUrl)continue;photoUrls.set(item.image_url,data.signedUrl);
+  if(generation!==galleryGeneration)return;if(!data?.signedUrl)continue;photoUrls.set(item.image_url,data.signedUrl);
   const tile=document.createElement('div'),img=document.createElement('img'),caption=document.createElement('small');
   img.src=data.signedUrl;img.alt='Dekoracje: '+item.address;img.loading='lazy';caption.textContent=item.address;
   tile.append(img,caption);tile.tabIndex=0;tile.setAttribute('role','button');tile.setAttribute('aria-label','Pokaż na mapie: '+item.address);tile.style.cursor='pointer';tile.onclick=()=>{const map=document.getElementById('map');if(map)map.scrollIntoView({behavior:'smooth',block:'center'});const card=[...document.querySelectorAll('.house-card')].find(e=>e.textContent.includes(item.address));card?.querySelector('button')?.click()};tile.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tile.click()}};el.append(tile);
@@ -43,16 +44,17 @@ async function gallery(){
 }
 async function admin(){
  if(!db)return;
- const {data:{user}}=await db.auth.getUser();
+ const {data:{user},error:authError}=await db.auth.getUser();if(authError)console.warn('Auth:',authError.message);
  $('adminLogout').hidden=!user;
  $('adminEntries').replaceChildren();
  if(!user){$('adminStatus').textContent='Zaloguj się, aby moderować.';return}
- const {data:role}=await db.from('halloween_moderators').select('user_id').eq('user_id',user.id).maybeSingle();
+ const {data:role,error:roleError}=await db.from('halloween_moderators').select('user_id').eq('user_id',user.id).maybeSingle();if(roleError){$('adminStatus').textContent='Nie udało się sprawdzić uprawnień moderatora.';return}
  if(!role){$('adminStatus').textContent='To konto nie ma przypisanej roli moderatora.';return}
  $('adminStatus').textContent='Zalogowano jako moderator.';
  const {data,error}=await db.from('halloween_places').select('id,address,note,status').eq('status','pending').limit(100);
  if(error){$('adminStatus').textContent='Nie udało się pobrać zgłoszeń.';return}
- if(!data.length){$('adminEntries').textContent='Brak oczekujących zgłoszeń.';return}
+ if(!data?.length){$('adminEntries').textContent='Brak oczekujących zgłoszeń.';return}
+ $('adminStatus').textContent='Oczekujące zgłoszenia: '+data.length;
  for(const item of data){
   const row=document.createElement('div');row.style.cssText='border-top:1px solid #394456;padding:10px 0';
   const name=document.createElement('strong');name.textContent=item.address;row.append(name);
@@ -60,7 +62,7 @@ async function admin(){
   for(const [status,label] of [['approved','Zatwierdź'],['rejected','Odrzuć']]){
    const btn=document.createElement('button');btn.textContent=label;btn.type='button';btn.className=status==='rejected'?'secondary':'';
    btn.style.margin='5px';
-   btn.onclick=async()=>{btn.disabled=true;const {error}=await db.from('halloween_places').update({status}).eq('id',item.id);if(error){alert('Błąd moderacji');btn.disabled=false;return}await admin();location.reload()};
+   btn.onclick=async()=>{if(status==='rejected'&&!confirm('Odrzucić zgłoszenie: '+item.address+'?'))return;row.querySelectorAll('button').forEach(b=>b.disabled=true);const {error}=await db.from('halloween_places').update({status}).eq('id',item.id).eq('status','pending');if(error){alert('Błąd moderacji: '+error.message);row.querySelectorAll('button').forEach(b=>b.disabled=false);return}await admin();if(status==='approved')location.reload()};
    row.append(btn);
   }
   $('adminEntries').append(row);
