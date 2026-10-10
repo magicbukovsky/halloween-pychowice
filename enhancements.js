@@ -3,6 +3,7 @@
 const $=id=>document.getElementById(id);
 const db=window.halloweenDb||window.supabase?.createClient('https://jhxoxuowxwvnmrygioox.supabase.co','sb_publishable_aZIJOi53EyddXbsvBcgSEg_to_LNUTz',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const selected=new Set();
+let photoUrls=new Map();
 const places=()=>window.halloweenGetEntries?.()||[];
 function stats(){
  const all=places();
@@ -28,15 +29,15 @@ $('startRoute').onclick=()=>{
 };
 async function gallery(){
  if(!db)return;
- const el=$('gallery');el.replaceChildren();
+ const el=$('gallery');el.replaceChildren();photoUrls=new Map();
  const items=places().filter(p=>p.image_url);
  if(!items.length){el.textContent='Brak zatwierdzonych zdjęć.';return}
  for(const item of items){
   const {data}=await db.storage.from('halloween-photos').createSignedUrl(item.image_url,3600);
-  if(!data?.signedUrl)continue;
+  if(!data?.signedUrl)continue;photoUrls.set(item.image_url,data.signedUrl);
   const tile=document.createElement('div'),img=document.createElement('img'),caption=document.createElement('small');
   img.src=data.signedUrl;img.alt='Dekoracje: '+item.address;img.loading='lazy';caption.textContent=item.address;
-  tile.append(img,caption);el.append(tile);
+  tile.append(img,caption);tile.tabIndex=0;tile.setAttribute('role','button');tile.setAttribute('aria-label','Pokaż na mapie: '+item.address);tile.style.cursor='pointer';tile.onclick=()=>{const map=document.getElementById('map');if(map)map.scrollIntoView({behavior:'smooth',block:'center'});const card=[...document.querySelectorAll('.house-card')].find(e=>e.textContent.includes(item.address));card?.querySelector('button')?.click()};tile.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tile.click()}};el.append(tile);
   document.querySelectorAll('[data-photo]').forEach(x=>{if(x.dataset.photo===item.image_url)x.src=data.signedUrl});
  }
 }
