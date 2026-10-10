@@ -14,11 +14,17 @@ function stats(){
  document.querySelectorAll('.route-check').forEach(c=>{c.checked=selected.has(c.dataset.routeId)});
 }
 function countdown(){
- const now=new Date(),date=new Date(2026,9,31,17);
- const days=Math.ceil((date-now)/86400000);
- $('countdown').textContent=days>0?'🎃 Do Halloween: '+days+' dni':now.getFullYear()===2026&&now.getMonth()===9&&now.getDate()===31?'🎃 Dzisiaj Halloween!':'🎃 Halloween w Pychowicach';
+ const now=new Date(),year=now.getFullYear(),target=new Date(year,9,31,17,0,0);
+ const remaining=Math.max(0,target.getTime()-now.getTime());
+ const days=Math.floor(remaining/86400000),hours=Math.floor(remaining/3600000)%24,minutes=Math.floor(remaining/60000)%60;
+ $('clockDays').textContent=String(days).padStart(2,'0');$('clockHours').textContent=String(hours).padStart(2,'0');$('clockMinutes').textContent=String(minutes).padStart(2,'0');
+ const halloween=now.getMonth()===9&&now.getDate()===31;
+ $('countdown').textContent=halloween?'🎃 Dzisiaj Halloween!':remaining>0?'🌙 Do halloweenowej nocy':'🎃 Halloween w Pychowicach';
+ if(halloween){$('clockDays').textContent='🎃';$('clockHours').textContent='🍬';$('clockMinutes').textContent='✨'}
+ else if(!remaining){$('clockDays').textContent='00';$('clockHours').textContent='00';$('clockMinutes').textContent='00'}
 }
-function count(){$('routeCount').textContent='Wybrano '+selected.size+' miejsc'}
+
+function count(){const ids=[...selected];$('routeCount').textContent='Wybrano '+ids.length+' miejsc'+(ids.length>9?' — maksymalnie 9 dla Google Maps':'');window.halloweenPreviewRoute?.(ids)}
 document.addEventListener('change',e=>{if(e.target.matches('.route-check')){e.target.checked?selected.add(e.target.dataset.routeId):selected.delete(e.target.dataset.routeId);count()}});
 $('clearRoute').onclick=()=>{selected.clear();document.querySelectorAll('.route-check').forEach(c=>c.checked=false);count()};
 $('startRoute').onclick=()=>{
@@ -82,7 +88,8 @@ $('adminLogin').onclick=async()=>{
  finally{button.disabled=false}
 };
 $('adminLogout').onclick=async()=>{await db.auth.signOut();await admin()};
-window.addEventListener('halloween:loaded',()=>{stats();gallery()});
+window.addEventListener('halloween:loaded',()=>{stats();count();gallery()});
 if(db){db.auth.onAuthStateChange(()=>{setTimeout(admin,0)});admin()}
 countdown();stats();count();
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){setInterval(countdown,60000)}
 })();
