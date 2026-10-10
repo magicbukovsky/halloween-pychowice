@@ -156,8 +156,10 @@ header{overflow:hidden}.night-sky{position:absolute;inset:0;pointer-events:none;
 @media(prefers-reduced-motion:reduce){.night-star,.night-bat{animation:none!important}.house-card,.gallery>div{transition:none!important}}
 /* iOS drawer fix: navigation stays above backdrop, drawer stays legible */
 @media(max-width:800px){
+ /* Remove stacking context that trapped the drawer below its own backdrop */
+ .layout{z-index:auto!important}
  body.drawer-open .floating-actions{z-index:1400;pointer-events:auto}
- body.drawer-open aside{z-index:1300;bottom:calc(76px + env(safe-area-inset-bottom));max-height:calc(88dvh - 76px);background:#24142f;opacity:1}
+ body.drawer-open aside{z-index:1300;bottom:calc(76px + env(safe-area-inset-bottom));max-height:calc(88dvh - 76px);background:#24142f;opacity:1;visibility:visible;pointer-events:auto}
  body.drawer-open .drawer-backdrop{z-index:1100}
  .floating-actions button{opacity:1!important;pointer-events:auto!important;touch-action:manipulation}
  .drawer-top{position:sticky;top:-16px;z-index:2;background:#24142f;padding:13px 0 10px}
