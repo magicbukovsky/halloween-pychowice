@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Halloween w Pychowicach 🎃</title><meta name="theme-color" content="#171126">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font:16px system-ui,-apple-system,sans-serif;background:#171126;color:#f7f0ff}header{padding:16px 20px;background:#241633;border-bottom:1px solid #4a315d}h1{margin:0;font-size:1.5rem}header p{margin:5px 0;color:#d6c4e2;font-size:.9rem}.layout{display:grid;grid-template-columns:340px 1fr;height:calc(100dvh - 91px)}aside{overflow:auto;padding:18px;background:#20152e}#map{height:100%;min-height:400px}h2{font-size:1.1rem;margin:0 0 14px}label{display:block;font-weight:650;font-size:.9rem;margin:12px 0 5px}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:10px;border-radius:9px;border:1px solid #6b5479;background:#30213f;color:#fff}input::placeholder{color:#b6a6c0}button{border:0;border-radius:9px;padding:11px 14px;background:#ff9f36;color:#201126;font-weight:750;cursor:pointer}button.secondary{background:#48355a;color:#fff}button:focus-visible,input:focus-visible{outline:3px solid #ffb66b}button:disabled{opacity:.5;cursor:wait}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hint{font-size:.8rem;color:#d4c3de;line-height:1.45}.notice{background:#372340;border:1px solid #785477;padding:10px;border-radius:9px;margin-bottom:14px;font-size:.85rem}.checks{display:flex;gap:15px;flex-wrap:wrap}.checks label{font-weight:400;margin:5px 0}#status{font-size:.85rem;min-height:1.4em;color:#ffc47e}#entries{padding:0;list-style:none}#entries li{background:#30213f;border-radius:9px;margin:8px 0;padding:10px}#entries button{margin-top:7px;padding:6px 10px;font-size:.8rem}.small{font-size:.8rem;color:#d6c4e2}a{color:#ffbd79}@media(max-width:780px){.layout{display:flex;flex-direction:column;height:auto}#map{height:53dvh;min-height:320px;order:0}aside{order:1;overflow:visible}header{padding:13px 16px}h1{font-size:1.25rem}}
+</style></head><body>
+<header><h1>🎃 Halloween w Pychowicach</h1><p>Mapa dekoracji i miejsc, które zapraszają po cukierki</p></header>
+<div class="layout"><aside>
+<div class="notice"><strong>Wersja demonstracyjna.</strong> Wpisy są zapisane tylko w tej przeglądarce — inni mieszkańcy jeszcze ich nie widzą. Nie dodawaj cudzego adresu bez zgody.</div>
+<h2>Dodaj miejsce</h2>
+<form id="form">
+<label for="address">Adres (Pychowice, Kraków)</label><input id="address" required maxlength="180" placeholder="Ulica i numer domu">
+<div class="buttons"><button class="secondary" type="button" id="locate">Znajdź adres na mapie</button><button class="secondary" type="button" id="pick">Wskaż na mapie</button></div>
+<p class="hint">Wyszukaj adres albo kliknij „Wskaż na mapie”, a następnie dotknij odpowiedniego miejsca. Sprawdź, czy znacznik jest ustawiony prawidłowo.</p>
+<div id="status" role="status" aria-live="polite"></div>
+<label for="hours">Godziny przyjmowania dzieci</label><input id="hours" maxlength="80" placeholder="np. 17:00–20:00">
+<div class="checks"><label><input id="decor" type="checkbox" checked style="width:auto"> 🎃 Dekoracje</label><label><input id="candy" type="checkbox" checked style="width:auto"> 🍬 Cukierki</label></div>
+<label for="note">Dodatkowe informacje (opcjonalnie)</label><textarea id="note" rows="2" maxlength="240" placeholder="np. Prosimy dzwonić do furtki"></textarea>
+<div class="buttons"><button type="submit">Dodaj do mojej mapy</button></div>
+</form>
+<hr style="border:0;border-top:1px solid #4a315d;margin:22px 0">
+<h2>Widoczne miejsca</h2>
+<div class="checks"><label><input type="checkbox" id="showDecor" checked style="width:auto"> 🎃 Dekoracje</label><label><input type="checkbox" id="showCandy" checked style="width:auto"> 🍬 Cukierki</label></div>
+<ul id="entries"></ul>
+<p class="hint">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. Geokodowanie: Nominatim. Wpisy można usuwać z tej przeglądarki.</p>
+</aside><div id="map" aria-label="Mapa Pychowic"></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(()=>{'use strict';
+const key='pychowice-halloween-demo-v1', center=[50.035,19.893], map=L.map('map').setView(center,15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const $=id=>document.getElementById(id), layer=L.layerGroup().addTo(map);
+let entries=[],selected=null,picking=false,tempMarker=null;
+try{const data=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(data))entries=data.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon));}catch(e){}
+const save=()=>{try{localStorage.setItem(key,JSON.stringify(entries))}catch(e){$('status').textContent='Nie udało się zapisać wpisu w przeglądarce.'}};
+function select(lat,lon){selected={lat,lon};if(tempMarker)map.removeLayer(tempMarker);tempMarker=L.marker([lat,lon]).addTo(map).bindPopup('Wybrana lokalizacja').openPopup();map.setView([lat,lon],Math.max(map.getZoom(),16));$('status').textContent='📍 Lokalizacja wybrana. Możesz zapisać wpis.'}
+function draw(){layer.clearLayers();$('entries').replaceChildren();let count=0;for(const item of entries){if(!((item.decor&&$('showDecor').checked)||(item.candy&&$('showCandy').checked)))continue;count++;
+const marker=L.marker([item.lat,item.lon]).addTo(layer);
+const el=document.createElement('div');const heading=document.createElement('strong');heading.textContent=(item.decor?'🎃 ':'')+(item.candy?'🍬 ':'')+item.address;el.append(heading);
+for(const s of [item.hours&&'Godziny: '+item.hours,item.note])if(s){const p=document.createElement('p');p.textContent=s;el.append(p)}marker.bindPopup(el);
+const li=document.createElement('li');const title=document.createElement('strong');title.textContent=heading.textContent;li.append(title);const sub=document.createElement('div');sub.className='small';sub.textContent=item.hours||'Godziny niepodane';li.append(sub);
+const go=document.createElement('button');go.type='button';go.className='secondary';go.textContent='Pokaż';go.onclick=()=>{map.setView([item.lat,item.lon],17);marker.openPopup();window.scrollTo({top:0,behavior:'smooth'})};li.append(go);
+const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='Usuń';del.style.marginLeft='7px';del.onclick=()=>{if(confirm('Usunąć ten lokalny wpis?')){entries=entries.filter(x=>x.id!==item.id);save();draw()}};li.append(del);$('entries').append(li)}
+if(!count){const li=document.createElement('li');li.textContent='Brak miejsc. Dodaj pierwsze zgłoszenie!';$('entries').append(li)}}
+$('locate').onclick=async()=>{const addr=$('address').value.trim();if(!addr){$('status').textContent='Najpierw wpisz adres.';return}const btn=$('locate');btn.disabled=true;$('status').textContent='Szukam adresu…';try{const url='https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=pl&q='+encodeURIComponent(addr+', Pychowice, Kraków');const r=await fetch(url);if(!r.ok)throw Error('Usługa wyszukiwania jest niedostępna');const results=await r.json();const best=results.find(x=>Number(x.lat)>50.015&&Number(x.lat)<50.06&&Number(x.lon)>19.85&&Number(x.lon)<19.94);if(!best)throw Error('Nie znaleziono adresu w okolicy Pychowic. Wskaż miejsce ręcznie.');select(Number(best.lat),Number(best.lon))}catch(e){$('status').textContent=e.message||'Błąd wyszukiwania'}finally{btn.disabled=false}};
+$('pick').onclick=()=>{picking=true;$('status').textContent='Dotknij wybranego punktu na mapie.';if(innerWidth<781)window.scrollTo({top:0,behavior:'smooth'})};
+map.on('click',e=>{if(picking){select(e.latlng.lat,e.latlng.lng);picking=false}});
+$('form').onsubmit=e=>{e.preventDefault();if(!selected){$('status').textContent='Najpierw znajdź adres lub wskaż lokalizację na mapie.';return}if(!$('decor').checked&&!$('candy').checked){$('status').textContent='Zaznacz dekoracje lub cukierki.';return}
+entries.push({id:String(Date.now())+Math.random(),address:$('address').value.trim(),lat:selected.lat,lon:selected.lon,hours:$('hours').value.trim(),decor:$('decor').checked,candy:$('candy').checked,note:$('note').value.trim()});save();draw();$('form').reset();$('decor').checked=true;$('candy').checked=true;selected=null;if(tempMarker){map.removeLayer(tempMarker);tempMarker=null}$('status').textContent='Dodano lokalnie! Wspólna baza pojawi się w kolejnym etapie.'};
+$('showDecor').onchange=draw;$('showCandy').onchange=draw;draw();
+})();
+</script></body></html>
