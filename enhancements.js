@@ -68,7 +68,19 @@ async function admin(){
   $('adminEntries').append(row);
  }
 }
-$('adminLogin').onclick=async()=>{if(!db)return;const email=$('adminEmail').value.trim();if(!email)return;const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});$('adminStatus').textContent=error?'Nie udało się wysłać linku.':'Sprawdź pocztę i otwórz link logowania.'};
+$('adminLogin').onclick=async()=>{
+ const status=$('adminStatus'),button=$('adminLogin'),email=$('adminEmail').value.trim();
+ if(!db){status.textContent='Nie można połączyć się z Supabase. Odśwież stronę.';return}
+ if(!email||!$('adminEmail').checkValidity()){status.textContent='Wpisz poprawny adres e-mail.';return}
+ button.disabled=true;status.textContent='Wysyłanie linku logowania…';
+ try{
+  const redirectTo='https://magicbukovsky.github.io/halloween-pychowice/';
+  const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:false}});
+  if(error){console.error('Supabase Auth OTP:',error);const msg=error.message||'Nieznany błąd';status.textContent='Nie udało się wysłać linku: '+msg+(error.status===429?' Spróbuj ponownie później.':'');return}
+  status.textContent='Jeśli konto jest uprawnione, link został wysłany. Sprawdź skrzynkę i folder spam.';
+ }catch(e){console.error('Auth request:',e);status.textContent='Błąd połączenia podczas wysyłania linku: '+(e.message||'sprawdź sieć i spróbuj ponownie')}
+ finally{button.disabled=false}
+};
 $('adminLogout').onclick=async()=>{await db.auth.signOut();await admin()};
 window.addEventListener('halloween:loaded',()=>{stats();gallery()});
 if(db){db.auth.onAuthStateChange(()=>{setTimeout(admin,0)});admin()}
