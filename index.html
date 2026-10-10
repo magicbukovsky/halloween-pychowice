@@ -164,6 +164,18 @@ header{overflow:hidden}.night-sky{position:absolute;inset:0;pointer-events:none;
  .floating-actions button{opacity:1!important;pointer-events:auto!important;touch-action:manipulation}
  .drawer-top{position:sticky;top:-16px;z-index:2;background:#24142f;padding:13px 0 10px}
 }
+/* Mobile drawer rebuild: no backdrop, no competing stacking contexts */
+@media(max-width:800px){
+ body.drawer-open{overflow:hidden}
+ .drawer-backdrop,body.drawer-open .drawer-backdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+ .layout{position:static!important;z-index:auto!important;transform:none!important;filter:none!important}
+ #drawer{position:fixed!important;z-index:2147483000!important;top:calc(104px + env(safe-area-inset-top))!important;bottom:calc(84px + env(safe-area-inset-bottom))!important;left:8px!important;right:8px!important;width:auto!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain!important;transform:translate3d(0,110vh,0)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;background:#21132e!important;box-shadow:0 12px 50px #000b!important;border:1px solid #b37c9c!important;border-radius:20px!important;padding:16px 17px 28px!important;-webkit-overflow-scrolling:touch}
+ body.drawer-open #drawer{transform:translate3d(0,0,0)!important}
+ .floating-actions,body.drawer-open .floating-actions{position:fixed!important;z-index:2147483001!important;left:8px!important;right:8px!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;pointer-events:auto!important;opacity:1!important}
+ .floating-actions button{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+ .drawer-top{position:sticky!important;top:-16px!important;z-index:3!important;background:#21132e!important;padding:12px 0!important}
+ #drawer input,#drawer button,#drawer label{pointer-events:auto!important}
+}
 </style></head><body>
 <header><div class="night-sky" aria-hidden="true"><span class="night-moon"></span><span class="night-star star-one">✦</span><span class="night-star star-two">✧</span><span class="night-star star-three">✦</span><span class="night-bat bat-one">🦇</span><span class="night-bat bat-two">🦇</span></div><div class="brand"><div class="brand-icon" aria-hidden="true">🎃</div><div><div class="eyebrow">PYCHOWICE <span class="brand-dot">●</span> HALLOWEEN 2026</div><h1>Halloween <span class="heading-accent">Pychowice</span></h1></div></div><p>Jedna noc. Setki słodkich przygód. Odkryj, gdzie Pychowice rozświetlają się w Halloween.</p><span class="header-pill"><span class="live-dot"></span> ✦ HALLOWEENOWA NOC <span class="pill-divider">/</span> 31.10</span></header>
 <div class="app-marquee" aria-hidden="true"><span>✦ CUKIEREK ALBO PSIKUS</span><span>✧ PYCHOWICE PO ZMROKU</span><span>✦ 31 PAŹDZIERNIKA</span></div><div class="layout"><aside id="drawer" aria-label="Panel mapy"><div class="drawer-top"><strong>🎃 Halloween w Pychowicach</strong><button class="secondary" id="closeDrawer" type="button" aria-label="Zamknij panel">✕</button></div>
@@ -185,7 +197,7 @@ header{overflow:hidden}.night-sky{position:absolute;inset:0;pointer-events:none;
 <p id="syncStatus" class="hint">Ładowanie miejsc…</p><div class="extras"><h3>🚶 Zaplanuj spacer</h3><p class="hint">Zaznacz domy z cukierkami na liście.</p><button type="button" id="startRoute">Otwórz trasę</button> <button type="button" class="secondary" id="clearRoute">Wyczyść</button><p id="routeCount" class="hint">Wybrano 0 miejsc</p><p class="hint route-explain">✨ Podświetlona linia na mapie pokazuje kolejność wybranych punktów, a nie przebieg ulic. Dokładną trasę pieszą otworzysz w Google Maps.</p></div><ul id="entries"></ul><div class="extras"><h3>📸 Galeria dekoracji</h3><div id="gallery" class="gallery"></div></div><div class="extras"><h3>🛡️ Panel moderatora</h3><p class="hint">Dostęp tylko dla upoważnionych kont.</p><input type="email" id="adminEmail" placeholder="E-mail moderatora"><button type="button" id="adminLogin">Wyślij link logowania</button> <button type="button" id="adminLogout" class="secondary" hidden>Wyloguj</button><p id="adminStatus" class="hint"></p><div id="adminEntries"></div></div>
 <p class="hint">Mapa: Google Maps. Wpisy są moderowane przed publikacją.</p>
 </aside><div class="map-wrap"><div class="map-label"><div class="map-label-top"><span class="map-label-icon">⌖</span><span>MAPA NA ŻYWO <span class="map-label-status">●</span></span></div><strong>Pychowice, Kraków</strong><span>Odkrywaj miejsca w swojej okolicy</span></div><div id="map" aria-label="Mapa Pychowic"></div></div></div><div class="drawer-backdrop" id="drawerBackdrop"></div><nav class="floating-actions" aria-label="Działania mapy"><button class="secondary" type="button" id="browseBtn">◈ Odkrywaj <span id="placeCount"></span></button><button type="button" id="addBtn">＋ Dodaj miejsce</button></nav>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.76.1/dist/umd/supabase.min.js"></script><script src="config.js"></script><script defer src="enhancements.js?v=20261010-effects-1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.76.1/dist/umd/supabase.min.js"></script><script src="config.js"></script><script defer src="enhancements.js?v=20261010-effects-2"></script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
@@ -230,7 +242,7 @@ function draw(){
  $('placeCount').textContent='('+count+')';
  if(!count){const li=document.createElement('li');li.textContent='Brak miejsc. Dodaj pierwsze zgłoszenie!';$('entries').append(li)}
 }
-function openDrawer(target){document.body.classList.add('drawer-open');const drawer=$('drawer');drawer.scrollTop=0;requestAnimationFrame(()=>{const anchor=target==='browse'?document.querySelector('.filter-chips'):document.querySelector('#form');if(anchor)drawer.scrollTop=Math.max(0,anchor.getBoundingClientRect().top-drawer.getBoundingClientRect().top+drawer.scrollTop-70)})}
+function openDrawer(target){const drawer=$('drawer');document.body.classList.add('drawer-open');drawer.scrollTop=0;requestAnimationFrame(()=>requestAnimationFrame(()=>{const anchor=target==='browse'?document.querySelector('.filter-chips'):document.querySelector('#form');if(anchor){const offset=anchor.getBoundingClientRect().top-drawer.getBoundingClientRect().top+drawer.scrollTop;drawer.scrollTop=Math.max(0,offset-70)}}))}
 function closeDrawer(){document.body.classList.remove('drawer-open')}
 $('addBtn').onclick=()=>openDrawer('add');$('browseBtn').onclick=()=>openDrawer('browse');$('closeDrawer').onclick=closeDrawer;$('drawerBackdrop').onclick=closeDrawer;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
